@@ -12,11 +12,20 @@ app = Flask(__name__)
 def index():
     return render_template("login.html") #just displays the login page
 
-@app.route("/logged_i")
-def loggedIn():
+@app.route("/home")
+def home():
     username = request.cookies.get('username') #gets the user credentials so that it knows that the user is logged in
     password = request.cookies.get('password')
     if login.login(username, password):
-        return "logged in"
+        return render_template("home.html")
+    else:
+        return render_template("login.html")
+
+@app.route("/newItem")
+def newItem():
+    username = request.cookies.get('username') #gets the user credentials so that it knows that the user is logged in
+    password = request.cookies.get('password')
+    if login.login(username, password):
+        return render_template("newItem.html")
     else:
         return render_template("login.html")

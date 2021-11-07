@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<title>Login</title>
 <h1>Login</h1>
 <p>Username</p>
 <input type="text" id="username" name="username"><br>
@@ -8,9 +9,9 @@
 
 <script>
     function submit(){
-        document.cookie='';
-        document.cookie='username=' + document.getElementById("username").value;
+        document.cookie=''; //removes any cookies that may be there, may be subject to change
+        document.cookie='username=' + document.getElementById("username").value; //stores username and password so that the server can retreive it
         document.cookie='password=' + document.getElementById("password").value;
-        window.location.replace("/logged_i");
+        window.location.replace("/home");
     }
 </script>

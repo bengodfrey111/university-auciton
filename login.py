@@ -1,8 +1,8 @@
-def login(username, password):
-    usernames = ["Ben"] #just temporary, will be changed so that it is in sql and also passwords will be more secured
-    passwords = ["pass"]
-    for i in range(0,len(usernames)):
-        if username == usernames[i] and password == passwords[i]:
-            return True
+import sqlite3
 
+def login(username, password): #will give true of false depending if user details are correct
+    connection = sqlite3.connect("AuctionDB")
+    cursor = connection.execute("SELECT * FROM Users WHERE username=:givenName AND password=:givenPassword", {"givenName": username, "givenPassword": password}) #sql parameters prevent sql injection attacks, learnt how to implement parametrs in python using https://docs.python.org/3/library/sqlite3.html
+    for row in cursor:
+        return True
     return False
