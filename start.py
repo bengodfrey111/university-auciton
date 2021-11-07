@@ -11,16 +11,16 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("login.html", newPageLoc="/home") #just displays the login page
+    return render_template("login.html", newPageLoc="/home") #just displays the login page and allow python to dictate where to send the user after clicking submit (probably just leave it as a cosntant)
 
 @app.route("/home")
 def home():
     username = request.cookies.get('username') #gets the user credentials so that it knows that the user is logged in
     password = request.cookies.get('password')
-    if login.login(username, password):
+    if login.login(username, password): #if login credentials are valid then goes to right page, else goes back to log in so that they can put in valid credentials
         return render_template("home.html")
     else:
-        return render_template("login.html")
+        return render_template("login.html", newPageLoc="/home")
 
 @app.route("/newItem")
 def newItem():
@@ -29,4 +29,4 @@ def newItem():
     if login.login(username, password):
         return render_template("newItem.html")
     else:
-        return render_template("login.html")
+        return render_template("login.html", newPageLoc="/home")
