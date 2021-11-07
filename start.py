@@ -3,6 +3,7 @@ from markupsafe import escape
 from flask import request
 from flask import make_response
 from flask import render_template
+from flask import session
 
 import login #my login code
 
@@ -10,7 +11,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("login.html") #just displays the login page
+    return render_template("login.html", newPageLoc="/home") #just displays the login page
 
 @app.route("/home")
 def home():

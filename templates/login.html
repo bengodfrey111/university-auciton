@@ -12,6 +12,6 @@
         document.cookie=''; //removes any cookies that may be there, may be subject to change
         document.cookie='username=' + document.getElementById("username").value; //stores username and password so that the server can retreive it
         document.cookie='password=' + document.getElementById("password").value;
-        window.location.replace("/home");
+        window.location.replace("{{newPageLoc}}"); //sends to new page, made it so that I can get python to decide which page to send too (makes it easier since I can change it easier)
     }
 </script>
