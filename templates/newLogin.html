@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<title>New account</title>
+<h1>New account</h1>
+<div id="error" style="background-color: red; color: white;"></div> <!--learnt to change colours in https://www.w3schools.com/html/html_colors.asp-->
+
+<form action="/newUser" method="post", name="form">
+    <p>Username</p>
+    <input type="text" id="username" name="username"><br>
+    <p>Password</p>
+    <input type="password" id="password" name="password"><br>
+</form>
+<p>Password again</p>
+<input type="password" id="password2" name="password2"><br>
+<button type="button" onclick="submit()">submit</button><br>
+
+<script>
+    function submit(){
+        document.cookie=''; //removes any cookies that may be there
+        if(document.getElementById("password").value == document.getElementById("password2").value){ //checks if the two passwords 
+            //window.location.replace("/login"); //sends to new page, user will probably want to login after creating their new account
+            document.form.submit(); //submits the form, learnt in https://www.javascript-coder.com/javascript-form/javascript-form-submit/
+        }
+        else{
+            error.innerHTML = "<p>Two passwords are not the same</p>" //inject a meessage in the html when the two passwords do not match
+        }
+
+    }
+    if ({{validUser}}(false)){ //if python flask decides account isn't valid
+        error.innerHTML="<p>Username already in use</p>"
+    }
+</script>
