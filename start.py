@@ -62,4 +62,4 @@ def newItem():
 
 @app.route("/item/<int:ID>")
 def item(ID):
-    return render_template("item.html")
+    return render_template("item.html", idImage=ID)

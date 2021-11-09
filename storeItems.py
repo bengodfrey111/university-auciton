@@ -9,4 +9,4 @@ def newItem(itemName, description, username, image): #this will just allow the u
         primaryID = row[0]
     connection.commit()
     connection.close()
-    image.save("itemImages/" + str(primaryID)) #image is going to be saved using the primary key
+    image.save("static/itemImages/" + str(primaryID)) #image is going to be saved using the primary key
