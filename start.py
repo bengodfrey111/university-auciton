@@ -66,7 +66,7 @@ def newItem():
 @app.route("/item/<int:ID>")
 def item(ID): #this simply displays the item using its unique ID
     itemAtr = storeItems.item(ID)
-    if itemAtr != None:
+    if itemAtr != None: #checks if the item exists, if it exists then it will go to the normal page, if it doesn't then it will go to a page explaining that the item was not found
         return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDateTime(itemAtr["datetime"]))
     else:
         return render_template("noItem.html")

@@ -12,15 +12,15 @@ def newItem(itemName, description, username, image): #this will just allow the u
     connection.close()
     image.save("static/itemImages/" + str(primaryID)) #image is going to be saved using the primary key
 
-def item(ID):
+def item(ID): #this will get all the information on a specific item
     connection = sqlite3.connect("AuctionDB")
-    cursor = connection.execute("SELECT * FROM Items WHERE ID=:pID", {"pID": ID})
+    cursor = connection.execute("SELECT * FROM Items WHERE ID=:pID", {"pID": ID}) #gets all the attributes of an item that has a specific primary key (which there can only be one in existence)
     rawResult = []
     for row in cursor:
         rawResult = row
     connection.close()
     if rawResult != []:
-        result = {"name": row[1], "description": row[2], "username": row[3], "datetime": datetime.datetime.strptime(row[4], '%Y-%m-%d %H:%M:%S.%f')}
+        result = {"name": row[1], "description": row[2], "username": row[3], "datetime": datetime.datetime.strptime(row[4], '%Y-%m-%d %H:%M:%S.%f')} #formats the attributes of the item so that it is easier to read
         return result
     return None
 
