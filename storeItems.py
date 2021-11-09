@@ -19,8 +19,10 @@ def item(ID):
     for row in cursor:
         rawResult = row
     connection.close()
-    result = {"name": row[1], "description": row[2], "username": row[3], "datetime": datetime.datetime.strptime(row[4], '%Y-%m-%d %H:%M:%S.%f')}
-    return result
+    if rawResult != []:
+        result = {"name": row[1], "description": row[2], "username": row[3], "datetime": datetime.datetime.strptime(row[4], '%Y-%m-%d %H:%M:%S.%f')}
+        return result
+    return None
 
 if __name__ == "__main__":
-    print(item(1))
+    print(item(2))

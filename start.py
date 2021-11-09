@@ -4,13 +4,15 @@ from flask import request
 from flask import make_response
 from flask import render_template
 from flask import session
-
+import datetime
 
 import login #my login code
 import storeItems
 
 app = Flask(__name__)
 
+def stringDateTime(dateTime): #this simply makes the date time a string so that I can just stick it on a HTML page in a readable state
+    return str(dateTime.day) + "/" + str(dateTime.month) + "/" + str(dateTime.year) + " " + str(dateTime.hour) + ":" + str(dateTime.minute)
 
 @app.route("/")
 def index():
@@ -60,6 +62,11 @@ def newItem():
     else:
         return loginPage("!")
 
+
 @app.route("/item/<int:ID>")
-def item(ID):
-    return render_template("item.html", idImage=ID)
+def item(ID): #this simply displays the item using its unique ID
+    itemAtr = storeItems.item(ID)
+    if itemAtr != None:
+        return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDateTime(itemAtr["datetime"]))
+    else:
+        return render_template("noItem.html")
