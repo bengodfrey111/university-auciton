@@ -81,9 +81,11 @@ def item(ID): #this simply displays the item using its unique ID
 def myItems():
     username = request.cookies.get('username')
     password = request.cookies.get('password')
-    if login.login(username, password):
-        items = storeItems.myItems(username)
-        html = ""
-        return "w"
+    if login.login(username, password): #checks if user is logged in
+        items = storeItems.myItems(username) #gets all the items a specific user is selling
+        html = "<!DOCTYPE html>"
+        for i in range(0,len(items)): #loops around all the items returned by sql so they can all be displayed in html
+            html+= "<h2 href='/item" + str(items[i]["ID"]) + "'>" + str(items[i]["name"]) + "</h2><br><img src='/static/itemImages/" + str(items[i]["ID"]) + "'/><br><p>" + str(items[i]["description"]) + "</p><br><br>"
+        return html
     else:
         return loginPage("!")
