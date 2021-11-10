@@ -24,5 +24,14 @@ def item(ID): #this will get all the information on a specific item
         return result
     return None
 
+def myItems(username): #this will retreive the items that a specific user is selling
+    connection = sqlite3.connect("AuctionDB")
+    cursor = connection.execute("SELECT * FROM Items WHERE username=:name", {"name": username})
+    result = []
+    for row in cursor:
+        result.append({"name": row[1], "description": row[2], "username": row[3], "datetime": datetime.datetime.strptime(row[4], '%Y-%m-%d %H:%M:%S.%f')}) #this will store all the atributes of the objects returned
+    connection.close()
+    return result
+
 if __name__ == "__main__":
-    print(item(2))
+    print(myItems("Ben2"))

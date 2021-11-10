@@ -11,8 +11,8 @@ import storeItems
 
 app = Flask(__name__)
 
-def stringDateTime(dateTime): #this simply makes the date time a string so that I can just stick it on a HTML page in a readable state
-    return str(dateTime.day) + "/" + str(dateTime.month) + "/" + str(dateTime.year) + " " + str(dateTime.hour) + ":" + str(dateTime.minute)
+def stringDate(dateTime): #this simply makes the date time a string so that I can just stick it on a HTML page in a readable state
+    return str(dateTime.day) + "/" + str(dateTime.month) + "/" + str(dateTime.year)
 
 @app.route("/")
 def index():
@@ -67,6 +67,23 @@ def newItem():
 def item(ID): #this simply displays the item using its unique ID
     itemAtr = storeItems.item(ID)
     if itemAtr != None: #checks if the item exists, if it exists then it will go to the normal page, if it doesn't then it will go to a page explaining that the item was not found
-        return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDateTime(itemAtr["datetime"]))
+        username = request.cookies.get('username')
+        password = request.cookies.get('password')
+        if login.login(username, password):
+            return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDate(itemAtr["datetime"]), login="")
+        else:
+            return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDate(itemAtr["datetime"]), login="!")
     else:
         return render_template("noItem.html")
+
+
+@app.route("/myItems")
+def myItems():
+    username = request.cookies.get('username')
+    password = request.cookies.get('password')
+    if login.login(username, password):
+        items = storeItems.myItems(username)
+        html = ""
+        return "w"
+    else:
+        return loginPage("!")
