@@ -14,9 +14,27 @@ app = Flask(__name__)
 def stringDate(dateTime): #this simply makes the date time a string so that I can just stick it on a HTML page in a readable state
     return str(dateTime.day) + "/" + str(dateTime.month) + "/" + str(dateTime.year)
 
+def htmlListItems(items): #this lists a bunch of items viewable in html
+    html = ""
+    for i in range(0,len(items)): #loops through all the items
+        html+= "<div id='" + str(i) +"'><a href='/item/" + str(items[i]["ID"]) + "'><h2>" + str(items[i]["name"]) + "</h2></a><br><img src='/static/itemImages/" + str(items[i]["ID"]) + "' width='100' height='100'/><br><p>" + stringDate(items[i]["datetime"]) + "</p><br></div>"
+    return html
+
+
 @app.route("/")
 def index():
-    return loginPage() #just displays the login page and allow python to dictate where to send the user after clicking submit (probably just leave it as a cosntant)
+    html = "<!DOCTYPE html>"
+    username = request.cookies.get('username')
+    password = request.cookies.get('password')
+    if login.login(username, password):
+        html+= "<button onclick=logout()>Logout</button><br><br> <script>function logout(){document.cookie=''; window.location.replace('/');}</script>"
+    else:
+        html+= "<a href='/login'><small>login</small></a><br><br>"
+
+    items = storeItems.allItems() #gets all the items that are being sold
+    html+= htmlListItems(items)
+
+    return html
 
 @app.route("/login")
 def loginPage(validCredentials = ""):
@@ -43,6 +61,7 @@ def home():
         return render_template("home.html")
     else:
         return loginPage("!")
+
 
 @app.route("/newItem", methods=["GET", "POST"])
 def newItem():
@@ -84,8 +103,7 @@ def myItems():
     if login.login(username, password): #checks if user is logged in
         items = storeItems.myItems(username) #gets all the items a specific user is selling
         html = "<!DOCTYPE html>"
-        for i in range(0,len(items)): #loops around all the items returned by sql so they can all be displayed in html
-            html+= "<h2 href='/item" + str(items[i]["ID"]) + "'>" + str(items[i]["name"]) + "</h2><br><img src='/static/itemImages/" + str(items[i]["ID"]) + "'/><br><p>" + str(items[i]["description"]) + "</p><br><br>"
+        html+= htmlListItems(items)
         return html
     else:
         return loginPage("!")
