@@ -1,7 +1,7 @@
 import sqlite3
 
 def login(username, password): #will give true of false depending if user details are correct
-    connection = sqlite3.connect("AuctionDB")
+    connection = sqlite3.connect("AuctionDB.db")
     cursor = connection.execute("SELECT * FROM Users WHERE username=:givenName AND password=:givenPassword", {"givenName": username, "givenPassword": password}) #sql parameters prevent sql injection attacks, learnt how to implement parametrs in python using https://docs.python.org/3/library/sqlite3.html
     result = False
     for row in cursor:
@@ -10,7 +10,7 @@ def login(username, password): #will give true of false depending if user detail
     return result #will return result, if sql return anything then true but if sql returns nothing then false
 
 def accountExists(username): #checks if an account with a username exists (similar to checking if login is the same with identical logic)
-    connection = sqlite3.connect("AuctionDB")
+    connection = sqlite3.connect("AuctionDB.db")
     cursor = connection.execute("SELECT username FROM Users WHERE username=:givenName", {"givenName": username})
     result = False
     for row in cursor:
@@ -19,7 +19,7 @@ def accountExists(username): #checks if an account with a username exists (simil
     return result
 
 def newAccount(username, password):
-    connection = sqlite3.connect("AuctionDB")
+    connection = sqlite3.connect("AuctionDB.db")
     accountExist = accountExists(username)
     if not(accountExist): #checks if the account exists or not before creating the account
         cursor = connection.execute("INSERT INTO Users (username, password) VALUES (:newUsername, :newPassword)", {"newUsername": username, "newPassword": password}) #adds the new account to the database

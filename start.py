@@ -36,9 +36,16 @@ def index():
 
     return html
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def loginPage(validCredentials = ""):
-    return render_template("login.html", newPageLoc="/home", validUser=validCredentials) #just displays the login page and allow python to dictate where to send the user after clicking submit (probably just leave it as a cosntant)
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        if login.login(username, password): #if login credentials are valid then goes to right page, else goes back to log in so that they can put in valid credentials
+            return "<script>window.location.replace('/home')</script>"
+        else:
+            return render_template("login.html", validUser="!") #send login page up with error message if login is invalid
+    return render_template("login.html", validUser=validCredentials) #just displays the login page
 
 
 @app.route("/newUser", methods=["GET", "POST"]) #this will allow a user to create a new account

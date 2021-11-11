@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <title>Login</title>
 <h1>Login</h1>
-<div id="error" style="background-color: red; color: white;"></div>
-<p>Username</p>
-<input type="text" id="username" name="username"><br>
-<p>Password</p>
-<input type="password" id="password" name="password"><br>
+<form action="/login" method="post", name="form", enctype="multipart/form-data">
+    <div id="error" style="background-color: red; color: white;"></div>
+    <p>Username</p>
+    <input type="text" id="username" name="username"><br>
+    <p>Password</p>
+    <input type="password" id="password" name="password"><br>
+</form>
 <button type="button" onclick="submit()">submit</button><br>
 <a href="/newUser">create account</a>
 
@@ -14,7 +16,7 @@
         document.cookie=''; //removes any cookies that may be there, may be subject to change
         document.cookie='username=' + document.getElementById("username").value; //stores username and password so that the server can retreive it
         document.cookie='password=' + document.getElementById("password").value;
-        window.location.replace("{{newPageLoc}}"); //sends to new page, made it so that I can get python to decide which page to send too (makes it easier since I can change it easier)
+        document.form.submit();
     }
 
     if ({{validUser}}(false)){ //if python flask decides account isn't valid (easier to do this since I just need to add a single character parameter to get the correct change to the page)
