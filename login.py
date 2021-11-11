@@ -30,4 +30,4 @@ def newAccount(username, password):
 
 if __name__ == "__main__":
     print(accountExists("Ben2"))
-    #print(login("Ben2", "pass2"))
+    #print(login("Ben2", "pass2")) #fdsf
