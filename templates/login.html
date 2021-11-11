@@ -13,13 +13,10 @@
 
 <script>
     function submit(){
-        document.cookie=''; //removes any cookies that may be there, may be subject to change
-        document.cookie='username=' + document.getElementById("username").value; //stores username and password so that the server can retreive it
-        document.cookie='password=' + document.getElementById("password").value;
         document.form.submit();
     }
 
     if ({{validUser}}(false)){ //if python flask decides account isn't valid (easier to do this since I just need to add a single character parameter to get the correct change to the page)
-        error.innerHTML="<p>Invalid credentials</p>"
+        error.innerHTML="<p>Invalid credentials</p>";
     }
 </script>
