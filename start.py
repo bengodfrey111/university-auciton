@@ -100,10 +100,11 @@ def newItem():
 def item(ID): #this simply displays the item using its unique ID
     itemAtr = storeItems.item(ID)
     if itemAtr != None: #checks if the item exists, if it exists then it will go to the normal page, if it doesn't then it will go to a page explaining that the item was not found
+        accountDetails = login.account(itemAtr["username"]) #gets user contact details
         if session.get("username"): #checks if user is logged in
-            return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDate(itemAtr["datetime"]), login="")
+            return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDate(itemAtr["datetime"]), email = accountDetails["email"], phoneNumber = accountDetails["phoneNumber"], login="")
         else:
-            return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDate(itemAtr["datetime"]), login="!")
+            return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDate(itemAtr["datetime"]), email = accountDetails["email"], phoneNumber = accountDetails["phoneNumber"], login="!")
     else:
         return render_template("noItem.html")
 

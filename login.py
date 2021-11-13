@@ -32,11 +32,10 @@ def account(username): #gets information about account except password and usern
     cursor = connection.execute("SELECT email, phoneNumber FROM Users WHERE username=:givenName", {"givenName": username})
     result = False
     for row in cursor:
-        result = {"email": row[2], "phoneNumber": row[3]} #puts valid data in list to make it easy to read
+        result = {"email": row[0], "phoneNumber": row[1]} #puts valid data in list to make it easy to read
     connection.close()
     return result
 
 
 if __name__ == "__main__": #testing functions
-    print(accountExists("Ben2"))
-    #print(login("Ben2", "pass2"))
+    print(account("Ben"))
