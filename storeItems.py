@@ -43,4 +43,4 @@ def allItems(): #retreiving all the items that are being sold
     return result
 
 if __name__ == "__main__":
-    print(allItems())
+    print(allItems()) #testing functions

@@ -18,16 +18,25 @@ def accountExists(username): #checks if an account with a username exists (simil
     connection.close()
     return result
 
-def newAccount(username, password):
+def newAccount(username, password, email, phoneNumber):
     connection = sqlite3.connect("AuctionDB.db")
     accountExist = accountExists(username)
     if not(accountExist): #checks if the account exists or not before creating the account
-        cursor = connection.execute("INSERT INTO Users (username, password) VALUES (:newUsername, :newPassword)", {"newUsername": username, "newPassword": password}) #adds the new account to the database
+        connection.execute("INSERT INTO Users (username, password, email, phoneNumber) VALUES (:newUsername, :newPassword, :newEmail, :newPhoneNumber)", {"newUsername": username, "newPassword": password, "newEmail": email, "newPhoneNumber": phoneNumber}) #adds the new account to the database
         connection.commit()
         connection.close()
     return accountExist #return if the account exists or not
 
+def account(username): #gets information about account except password and username
+    connection = sqlite3.connect("AuctionDB.db")
+    cursor = connection.execute("SELECT email, phoneNumber FROM Users WHERE username=:givenName", {"givenName": username})
+    result = False
+    for row in cursor:
+        result = {"email": row[2], "phoneNumber": row[3]} #puts valid data in list to make it easy to read
+    connection.close()
+    return result
 
-if __name__ == "__main__":
+
+if __name__ == "__main__": #testing functions
     print(accountExists("Ben2"))
-    #print(login("Ben2", "pass2")) #fdsf
+    #print(login("Ben2", "pass2"))
