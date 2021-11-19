@@ -1,0 +1,15 @@
+CREATE TABLE "Items" (
+	"ID"	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"name"	TEXT NOT NULL,
+	"description"	TEXT NOT NULL,
+	"username"	TEXT NOT NULL,
+	"datetime"	TEXT NOT NULL,
+	FOREIGN KEY("username") REFERENCES "Users"("username")
+);
+CREATE TABLE "Users" (
+	"username"	TEXT NOT NULL,
+	"password"	TEXT NOT NULL,
+	"email"	TEXT NOT NULL,
+	"phoneNumber"	TEXT NOT NULL,
+	PRIMARY KEY("username")
+);

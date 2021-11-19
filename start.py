@@ -4,8 +4,7 @@ from flask import request
 from flask import make_response
 from flask import render_template
 from flask import session
-
-import datetime
+import sqlite3
 
 import login #my login code
 import storeItems
@@ -22,6 +21,23 @@ def htmlListItems(items): #this lists a bunch of items viewable in html
         html+= "<div id='" + str(i) +"'><a href='/item/" + str(items[i]["ID"]) + "'><h2>" + str(items[i]["name"]) + "</h2></a><br><img src='/static/itemImages/" + str(items[i]["ID"]) + "' width='100' height='100'/><br><p>" + stringDate(items[i]["datetime"]) + "</p><br></div>"
     return html
 
+def databaseCreation():
+    try: #if database is not found then it will create a database instead with the right tables
+        file = open("AuctionDB.db","r")
+        file.close()
+    except FileNotFoundError:
+        file = open("AuctionDB.db","w") #create the file
+        file.close()
+        connection = sqlite3.connect("AuctionDB.db") #connects to the new database
+        cursor = connection.cursor()
+        tableCreate = open("databaseTableCreation.txt","r") #this file stores the sql commands to create the right tables
+        tableCreate = tableCreate.readlines()
+        string = ""
+        for i in range(0,len(tableCreate)):
+            string+= tableCreate[i] #makes the array representing each line into only one single string
+        tableCreate = string
+        cursor.executescript(tableCreate) #executes the sql script that will create the tables
+        connection.close()
 
 @app.route("/logout")
 def logout():
@@ -31,6 +47,7 @@ def logout():
 
 @app.route("/")
 def index():
+    databaseCreation() #creates database if not created
     html = "<!DOCTYPE html>"
     if session.get("username"): #if logged in send this html, else send another bit of html (login link)
         html+= "<button onclick=logout()>Logout</button><br><br> <script>function logout(){document.cookie=''; window.location.replace('/logout');}</script>"
@@ -40,7 +57,7 @@ def index():
         html+= "<a href='/login'><small>login</small></a><br><br>"
 
     items = storeItems.allItems() #gets all the items that are being sold and makes it presentable
-    html+= htmlListItems(items)
+    html+= htmlListItems(items) #list all items that user may want to buy
 
     return html
 
