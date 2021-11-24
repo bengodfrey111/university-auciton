@@ -8,6 +8,7 @@ import sqlite3
 
 import login #my login code
 import storeItems
+import bid
 
 app = Flask(__name__)
 app.secret_key = "zOGSyUx5ctSTf2UXwxBr" #just some random string to make the session key unpredictable
@@ -38,6 +39,7 @@ def databaseCreation():
         tableCreate = string
         cursor.executescript(tableCreate) #executes the sql script that will create the tables
         connection.close()
+databaseCreation() #creates database if not created (needs to run on server startup)
 
 @app.route("/logout")
 def logout():
@@ -47,7 +49,6 @@ def logout():
 
 @app.route("/")
 def index():
-    databaseCreation() #creates database if not created
     html = "<!DOCTYPE html>"
     if session.get("username"): #if logged in send this html, else send another bit of html (login link)
         html+= "<button onclick=logout()>Logout</button><br><br> <script>function logout(){document.cookie=''; window.location.replace('/logout');}</script>"
@@ -116,15 +117,43 @@ def newItem():
 @app.route("/item/<int:ID>")
 def item(ID): #this simply displays the item using its unique ID
     itemAtr = storeItems.item(ID)
-    if itemAtr != None: #checks if the item exists, if it exists then it will go to the normal page, if it doesn't then it will go to a page explaining that the item was not found
+    if itemAtr != None: #checks if the item exists, if it exists then it will go to the normal page, if it doesn't then it will go to a page explaining that the item was not found 
         accountDetails = login.account(itemAtr["username"]) #gets user contact details
         if session.get("username"): #checks if user is logged in
-            return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDate(itemAtr["datetime"]), email = accountDetails["email"], phoneNumber = accountDetails["phoneNumber"], login="")
+            return render_template("item.html", idImage=ID, user=itemAtr["username"], date=stringDate(itemAtr["datetime"]), email = accountDetails["email"], phoneNumber = accountDetails["phoneNumber"], dateTime=itemAtr["datetime"].strftime('%Y-%m-%d %H:%M'), login="")
         else:
-            return render_template("item.html", idImage=ID, name=itemAtr["name"], user=itemAtr["username"], description=itemAtr["description"], dateTime=stringDate(itemAtr["datetime"]), email = accountDetails["email"], phoneNumber = accountDetails["phoneNumber"], login="!")
+            return render_template("item.html", idImage=ID, user=itemAtr["username"], date=stringDate(itemAtr["datetime"]), email = accountDetails["email"], phoneNumber = accountDetails["phoneNumber"], dateTime=itemAtr["datetime"].strftime('%Y-%m-%d %H:%M'), login="!")
     else:
         return render_template("noItem.html")
 
+
+@app.route("/item/<int:ID>/jsonPrice")
+def JSONPrice(ID): #this is the json file with the current price of the item
+    firstBidding = bid.finalPrice(ID)
+    return {"currentPrice": firstBidding["currentPrice"], "currency": "£"}
+
+@app.route("/item/<int:ID>/json")
+def JSON(ID): #this is the json file with all the attributes of item that I want public, I think it improves the readability of the code
+    itemAtr = storeItems.item(ID)
+    return {"name": itemAtr["name"], "description": itemAtr["description"], "datetime": itemAtr["datetime"].strftime('%Y-%m-%d %H:%M')}
+
+
+
+@app.route("/item/<int:ID>/bid", methods=["GET", "POST"])
+def bidPage(ID): #this will allow the user to make a bid
+    itemAtr = storeItems.item(ID)
+    accountDetails = login.account(itemAtr["username"])
+    if session.get("username"):
+        if itemAtr != None:
+            if request.method == "POST":
+                maxBid = request.form["maxBid"]
+                bid.newBid(ID, session["username"], maxBid)
+                return item(ID)
+            return render_template("bid.html", ID=ID)
+        else:
+            return render_template("noItem.html")
+    else:
+        return loginPage("!")
 
 @app.route("/myItems")
 def myItems():

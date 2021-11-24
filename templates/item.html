@@ -1,14 +1,83 @@
 <!DOCTYPE html>
-<title>{{name}}</title>
+<title id="title"></title>
 <div id="login"></div>
-<h1>{{name}}</h1><br>
+<p id="timeDisplay"></p>
+<h1 id="nameHeading"></h1><br>
 <img src="/static/itemImages/{{idImage}}"/><br>
-<p><small>Uploaded {{dateTime}} by {{user}}</small></p>
-<p>{{description}}</p>
+<p><small>Uploaded {{date}} by {{user}}</small></p>
+<p id="description"></p>
+<p id="price"></p>
+<div id="bidButton"></div>
 <small><p>Email: {{email}} Phone Number: {{phoneNumber}}</p></small>
 
 <script>
     if({{login}}(false)){ //will display a login link if user isn't logged in yet
         login.innerHTML = '<a href="/login">login</a>';
+    }else{
+        buttonClick = "window.location.href='/item/{{idImage}}/bid'"
+        bidButton.innerHTML = '<button onclick="' + buttonClick + '">Bid</button>'
     }
+
+
+
+    function currentPrice(){
+        attributes = {};
+        fetch("/item/{{idImage}}/jsonPrice")    
+        .then(res => res.json())
+        .then((out) => {
+        price.innerHTML = out["currency"] + out["currentPrice"];
+        });
+    }
+
+    function timeLeft(timeM){//this calculates the weeks days hours minutes and seconds it will take for the bid to close
+        timeM = timeM / 1000; //makes it into seconds only
+        weeks = timeM / (60*60*24*7); //gets the number of weeks
+        leftover = weeks % 1;
+        weeks = weeks - leftover;
+
+        days = leftover * 7; //calculates the number of days left
+        leftover = days % 1;
+        days = days - leftover;
+
+        hours = leftover * 24; //calculates the amount of hours left
+        leftover = hours % 1;
+        hours = hours - leftover;
+
+        minutes = leftover * 60; //calculates the amount of minutes left
+        leftover = minutes % 1;
+        minutes = minutes - leftover;
+
+        seconds = leftover * 60; //calulates the amount of seconds left
+        leftover = seconds % 1;
+        seconds = Math.round(seconds);
+        return {"seconds": seconds, "minutes": minutes, "hours": hours, "days": days, "weeks": weeks};
+    }
+
+    function time(dateTime){ //gets the time left for the bid
+        now = new Date();
+        then = new Date(dateTime);
+        then = then.setDate(then.getDate() + 14);
+        difference = then - now //adds week to the date from python and then finds difference with the current datetime
+        timeLeftList = timeLeft(difference);
+        timeDisplay.innerHTML = timeLeftList["seconds"] + " seconds";
+        timeDisplay.innerHTML+= " " + timeLeftList["minutes"] + " minutes";
+        timeDisplay.innerHTML+= " " + timeLeftList["hours"] + " hours";
+        timeDisplay.innerHTML+= " " + timeLeftList["days"] + " days";
+        timeDisplay.innerHTML+= " " + timeLeftList["weeks"] + " weeks left";
+    }
+
+
+
+    fetch("/item/{{idImage}}/json")    
+        .then(res => res.json())// https://www.codegrepper.com/code-examples/javascript/javascript+read+json+file+from+url
+        .then((out) => {
+        description.innerHTML = out["description"];
+        nameHeading.innerHTML = out["name"];
+        title.innerHTML = out["name"];
+        time(out["datetime"]);
+        setInterval(function(){time(out["datetime"])}, 100);
+    });
+
+    currentPrice();
+    setInterval(currentPrice, 10000);
 </script>

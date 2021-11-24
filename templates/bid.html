@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<title>Bid</title>
+
+<form action="/item/{{ID}}/bid" method="post", name="form", enctype="multipart/form-data">
+    <p>Maximum Bid: </p><input type="number" id="maxBid" name="maxBid"><br>
+</form>
+
+<button type="button" onclick="submit()">submit</button><br>
+
+<script>
+
+    function submit(){
+        document.form.submit(); //submits the form
+    }
+</script>
