@@ -3,11 +3,11 @@
 <title>Bid</title>
 
 <form action="/item/{{ID}}/bid" method="post", name="form", enctype="multipart/form-data">
-    <p>Maximum Bid: </p><input type="number" id="maxBid" name="maxBid"><br>
+    <p>Maximum Bid (£): </p><input type="number" id="maxBid" name="maxBid"><br>
 </form>
 
 <button type="button" onclick="submit()">submit</button><br>
-
+<small>note will be rounded down if it isn't bidded for every 10p, can't reduce your bid</small>
 <script>
 
     function submit(){

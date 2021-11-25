@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <title id="title"></title>
+<a href="/">Home</a>
 <div id="login"></div>
 <p id="timeDisplay"></p>
 <h1 id="nameHeading"></h1><br>
 <img src="/static/itemImages/{{idImage}}"/><br>
 <p><small>Uploaded {{date}} by {{user}}</small></p>
+<p id="price"></p><br>
+<div id="bidButton"></div><br>
 <p id="description"></p>
-<p id="price"></p>
-<div id="bidButton"></div>
-<small><p>Email: {{email}} Phone Number: {{phoneNumber}}</p></small>
 
 <script>
     if({{login}}(false)){ //will display a login link if user isn't logged in yet
@@ -20,12 +20,12 @@
 
 
 
-    function currentPrice(){
+    function currentPrice(){ //retreives the json that gives the current price of the item
         attributes = {};
         fetch("/item/{{idImage}}/jsonPrice")    
         .then(res => res.json())
         .then((out) => {
-        price.innerHTML = out["currency"] + out["currentPrice"];
+        price.innerHTML = out["currency"] + out["currentPrice"] + "0"; //displays the result in html
         });
     }
 
@@ -67,17 +67,21 @@
     }
 
 
-
+    if({{sold}}(true)){ //this checks if the item is deemed sold yet
+        currentPrice();
+        setInterval(currentPrice, 10000);
+    }else{
+        price.innerHTML = "Bid over!!!";
+    }
     fetch("/item/{{idImage}}/json")    
-        .then(res => res.json())// https://www.codegrepper.com/code-examples/javascript/javascript+read+json+file+from+url
-        .then((out) => {
-        description.innerHTML = out["description"];
-        nameHeading.innerHTML = out["name"];
-        title.innerHTML = out["name"];
-        time(out["datetime"]);
-        setInterval(function(){time(out["datetime"])}, 100);
-    });
-
-    currentPrice();
-    setInterval(currentPrice, 10000);
+            .then(res => res.json())// https://www.codegrepper.com/code-examples/javascript/javascript+read+json+file+from+url
+            .then((out) => {
+            description.innerHTML = out["description"];
+            nameHeading.innerHTML = out["name"];
+            title.innerHTML = out["name"];
+            if({{sold}}(true)){
+                time(out["datetime"]);
+                setInterval(function(){time(out["datetime"])}, 100);
+            }
+        });
 </script>

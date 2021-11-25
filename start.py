@@ -1,3 +1,4 @@
+import datetime
 from flask import Flask
 from markupsafe import escape
 from flask import request
@@ -9,6 +10,7 @@ import sqlite3
 import login #my login code
 import storeItems
 import bid
+import emailSend
 
 app = Flask(__name__)
 app.secret_key = "zOGSyUx5ctSTf2UXwxBr" #just some random string to make the session key unpredictable
@@ -119,10 +121,15 @@ def item(ID): #this simply displays the item using its unique ID
     itemAtr = storeItems.item(ID)
     if itemAtr != None: #checks if the item exists, if it exists then it will go to the normal page, if it doesn't then it will go to a page explaining that the item was not found 
         accountDetails = login.account(itemAtr["username"]) #gets user contact details
-        if session.get("username"): #checks if user is logged in
-            return render_template("item.html", idImage=ID, user=itemAtr["username"], date=stringDate(itemAtr["datetime"]), email = accountDetails["email"], phoneNumber = accountDetails["phoneNumber"], dateTime=itemAtr["datetime"].strftime('%Y-%m-%d %H:%M'), login="")
+        auctionDone = ""
+        if (itemAtr["datetime"] + datetime.timedelta(days=14)) >= datetime.datetime.now():
+            auctionDone = ""
         else:
-            return render_template("item.html", idImage=ID, user=itemAtr["username"], date=stringDate(itemAtr["datetime"]), email = accountDetails["email"], phoneNumber = accountDetails["phoneNumber"], dateTime=itemAtr["datetime"].strftime('%Y-%m-%d %H:%M'), login="!")
+            auctionDone = "!"
+        if session.get("username"): #checks if user is logged in
+                return render_template("item.html", idImage=ID, user=itemAtr["username"], date=stringDate(itemAtr["datetime"]), login="", sold=auctionDone)
+        else:
+            return render_template("item.html", idImage=ID, user=itemAtr["username"], date=stringDate(itemAtr["datetime"]), login="!", sold=auctionDone)
     else:
         return render_template("noItem.html")
 
@@ -130,7 +137,10 @@ def item(ID): #this simply displays the item using its unique ID
 @app.route("/item/<int:ID>/jsonPrice")
 def JSONPrice(ID): #this is the json file with the current price of the item
     firstBidding = bid.finalPrice(ID)
-    return {"currentPrice": firstBidding["currentPrice"], "currency": "£"}
+    if firstBidding != None:
+        return {"currentPrice": firstBidding["currentPrice"], "currency": "£"}
+    else:
+        return {"currentPrice": "0", "currency": "£"}
 
 @app.route("/item/<int:ID>/json")
 def JSON(ID): #this is the json file with all the attributes of item that I want public, I think it improves the readability of the code
@@ -144,11 +154,22 @@ def bidPage(ID): #this will allow the user to make a bid
     itemAtr = storeItems.item(ID)
     accountDetails = login.account(itemAtr["username"])
     if session.get("username"):
-        if itemAtr != None:
-            if request.method == "POST":
-                maxBid = request.form["maxBid"]
-                bid.newBid(ID, session["username"], maxBid)
-                return item(ID)
+        if itemAtr != None: #checks if item exists
+            if (itemAtr["datetime"] + datetime.timedelta(days=14)) >= datetime.datetime.now(): #checks if bid is over
+                if request.method == "POST": #handles the bid that the user makes
+                    maxBid = request.form["maxBid"]
+                    max = bid.maxBid(ID)
+                    response = bid.newBid(ID, session["username"], maxBid) #creates the new bid
+                    if response: #checks if bid was made
+                        currentAccount = login.account(session["username"])
+                        emailSend.bidSet(itemAtr, maxBid, currentAccount)
+                        secondMax = bid.secondMaxBid(ID)
+                        if max == secondMax: #this will send an email if someones bid was surpassed
+                            surAccount = login.account(itemAtr["username"])
+                            emailSend.surpassedBid(itemAtr, surAccount)
+                    return item(ID)
+            else:
+                return "Bid is Over!!!" #shows when bidding is over to prevent new bids
             return render_template("bid.html", ID=ID)
         else:
             return render_template("noItem.html")
