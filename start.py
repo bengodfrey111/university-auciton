@@ -66,9 +66,9 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def loginPage(validCredentials = ""):
-    if request.method == "POST":
+    if request.method == "POST": #if tis handling the forms
         username = request.form["username"]
-        password = request.form["password"]
+        password = request.form["password"] #gets inputed username and password
         if login.login(username, password): #if login credentials are valid then goes to right page, else goes back to log in so that they can put in valid credentials
             session["username"] = username
             return "<script>window.location.replace('/')</script>"
@@ -137,7 +137,7 @@ def item(ID): #this simply displays the item using its unique ID
 @app.route("/item/<int:ID>/jsonPrice")
 def JSONPrice(ID): #this is the json file with the current price of the item
     firstBidding = bid.finalPrice(ID)
-    if firstBidding != None:
+    if firstBidding != None: #if there is a bid for the item
         return {"currentPrice": firstBidding["currentPrice"], "currency": "£"}
     else:
         return {"currentPrice": "0", "currency": "£"}

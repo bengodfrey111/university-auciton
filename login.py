@@ -19,7 +19,7 @@ def accountExists(username): #checks if an account with a username exists (simil
     cursor = connection.execute("SELECT username FROM Users WHERE username=:givenName", {"givenName": username})
     result = False
     for row in cursor:
-        result = True
+        result = True #account exists so result will be true
     connection.close()
     return result
 
