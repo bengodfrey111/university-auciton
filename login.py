@@ -1,8 +1,8 @@
 import sqlite3
 import hashlib
 
-def hashPassword(username, password): #this hashes the password, learnt in https://docs.python.org/3/library/hashlib.html, it has a randomly generated string to make it difficult to guess the hash
-    return str(hashlib.sha224(b"xX}H@!hh3M@pJy.Q,KJC/}ikjJDz@U[),{+q;aBztqnY-Ww&);k_Nuaw2$2A_#Jw*[2&j+8/%r_e3@x;9-VVUJ$8er!)),hda%MB" + str(username).encode() + str(password).encode()).hexdigest())
+def hashPassword(username, password): #this hashes the password, learnt in https://docs.python.org/3/library/hashlib.html
+    return str(hashlib.sha224(b"" + str(username).encode() + str(password).encode()).hexdigest())
 
 def login(username, password): #will give true of false depending if user details are correct
     password = hashPassword(username, password)
@@ -25,9 +25,9 @@ def accountExists(username): #checks if an account with a username exists (simil
 
 def newAccount(username, password, email, phoneNumber):
     password = hashPassword(username, password)
-    connection = sqlite3.connect("AuctionDB.db")
     accountExist = accountExists(username)
     if not(accountExist): #checks if the account exists or not before creating the account
+        connection = sqlite3.connect("AuctionDB.db")
         connection.execute("INSERT INTO Users (username, password, email, phoneNumber) VALUES (:newUsername, :newPassword, :newEmail, :newPhoneNumber)", {"newUsername": username, "newPassword": password, "newEmail": email, "newPhoneNumber": phoneNumber}) #adds the new account to the database
         connection.commit()
         connection.close()

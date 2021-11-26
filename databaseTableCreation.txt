@@ -4,6 +4,7 @@ CREATE TABLE "Items" (
 	"description"	TEXT NOT NULL,
 	"username"	TEXT NOT NULL,
 	"datetime"	TEXT NOT NULL,
+	"finished"	INTEGER,
 	FOREIGN KEY("username") REFERENCES "Users"("username")
 );
 CREATE TABLE "Users" (
