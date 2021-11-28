@@ -31,7 +31,7 @@
     function submit(){
         document.cookie=''; //removes any cookies that may be there
         if(document.getElementById("password").value == document.getElementById("password2").value){ //checks if the two passwords 
-            if(document.getElementById("phoneNumber").value.length < 11){
+            if(document.getElementById("phoneNumber").value.length < 11 && document.getElementById("phoneNumber").value.length > 0){
                 inside = insideString("@", document.getElementById("email").value) //sees if "@" is inside the email
                 if(document.getElementById("email").value.length < 50 && inside){
                     document.form.submit(); //submits the form, learnt in https://www.javascript-coder.com/javascript-form/javascript-form-submit/
