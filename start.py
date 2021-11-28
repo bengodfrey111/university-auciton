@@ -6,11 +6,29 @@ from flask import make_response
 from flask import render_template
 from flask import session
 import sqlite3
+import time
+from threading import Thread, Event
 
 import login #my login code
 import storeItems
 import bid
 import emailSend
+
+
+def searchAndCloseItems(): #this is invloved in handling when the bid closes https://smirnov-am.github.io/background-jobs-with-flask/
+    while True:
+        time.sleep(10)
+        closeItems = storeItems.dueClose()
+        for i in range(0,len(closeItems)): #cycles through all the items that has been close
+            log = bid.finalPrice(closeItems[i]["ID"])
+            account = login.account(log["username"])
+            emailSend.wonBid(closeItems[i], log["currentPrice"] ,account) #sends email to winner
+
+    
+thread = Thread(target=searchAndCloseItems)
+thread.daemon = True
+thread.start()
+
 
 app = Flask(__name__)
 app.secret_key = "zOGSyUx5ctSTf2UXwxBr" #just some random string to make the session key unpredictable
@@ -21,7 +39,13 @@ def stringDate(dateTime): #this simply makes the date time a string so that I ca
 def htmlListItems(items): #this lists a bunch of items viewable in html
     html = ""
     for i in range(0,len(items)): #loops through all the items
-        html+= "<div id='" + str(i) +"'><a href='/item/" + str(items[i]["ID"]) + "'><h2>" + str(items[i]["name"]) + "</h2></a><br><img src='/static/itemImages/" + str(items[i]["ID"]) + "' width='100' height='100'/><br><p>" + stringDate(items[i]["datetime"]) + "</p><br></div>"
+        finalPrice = bid.finalPrice(items[i]["ID"])
+        price = finalPrice["currentPrice"]
+        if price % 1 == 0:
+            price = str(int(finalPrice["currentPrice"]))
+        else:
+            price = str(finalPrice["currentPrice"]) + "0"
+        html+= "<div id='" + str(i) +"'><a href='/item/" + str(items[i]["ID"]) + "'><h2>" + str(items[i]["name"]) + "</h2></a><br><img src='/static/itemImages/" + str(items[i]["ID"]) + "' width='100' height='100'/><br>" + "<p>£" + price + "</p><p>" + stringDate(items[i]["datetime"]) + "</p><br></div>"
     return html
 
 def databaseCreation():
@@ -43,6 +67,7 @@ def databaseCreation():
         connection.close()
 databaseCreation() #creates database if not created (needs to run on server startup)
 
+
 @app.route("/logout")
 def logout():
     session.pop("username", default=None)
@@ -54,12 +79,12 @@ def index():
     html = "<!DOCTYPE html>"
     if session.get("username"): #if logged in send this html, else send another bit of html (login link)
         html+= "<button onclick=logout()>Logout</button><br><br> <script>function logout(){document.cookie=''; window.location.replace('/logout');}</script>"
-        html+= '<button type="button" onclick="window.location.href=' + "'" + "/newItem" + "'" + '">Sell new item</button>'
+        html+= '<button type="button" onclick="window.location.href=' + "'" + "/newItem" + "'" + '">Sell new item</button>' #display these when the user is logged in
         html+= '<button type="button" onclick="window.location.href=' + "'" + "/myItems" + "'" + '">My items</button>'
     else:
-        html+= "<a href='/login'><small>login</small></a><br><br>"
+        html+= "<a href='/login'><small>login</small></a><br><br>" #display this when user isn't logged in
 
-    items = storeItems.allItems() #gets all the items that are being sold and makes it presentable
+    items = storeItems.openItems() #gets all the items that are being sold and makes it presentable
     html+= htmlListItems(items) #list all items that user may want to buy
 
     return html
@@ -84,19 +109,14 @@ def newUser():
         password = request.form["password"]
         email = request.form["email"]
         phoneNumber = request.form["phoneNumber"]
-        accountAlreadyExist = login.newAccount(username, password, email, phoneNumber) #inserts the data to create the account
-        if accountAlreadyExist:
-            return render_template("newLogin.html", validUser='!') #exclamation mark means not which means username is not valid
-        return loginPage() #if login info valid, user will probably want to login so will go to login page
+        if len(username) < 50 and len(password) < 50 and len(email) < 50 and len(phoneNumber) < 11:
+            accountAlreadyExist = login.newAccount(username, password, email, phoneNumber) #inserts the data to create the account
+            if accountAlreadyExist:
+                return render_template("newLogin.html", validUser='!') #exclamation mark means not which means username is not valid
+            return loginPage() #if login info valid, user will probably want to login so will go to login page
+        else:
+            return render_template("newLogin.html", validUser='!')
     return render_template("newLogin.html")
-
-
-@app.route("/home") #may not be used anymore, probably going to vanish soon
-def home():
-    if session.get("username"): #checks if user is logged in
-        return render_template("home.html")
-    else:
-        return loginPage("!")
 
 
 @app.route("/newItem", methods=["GET", "POST"])
@@ -134,9 +154,9 @@ def item(ID): #this simply displays the item using its unique ID
         return render_template("noItem.html")
 
 
-@app.route("/item/<int:ID>/jsonPrice")
-def JSONPrice(ID): #this is the json file with the current price of the item
-    firstBidding = bid.finalPrice(ID)
+@app.route("/item/<int:itemID>/jsonPrice")
+def JSONPrice(itemID): #this is the json file with the current price of the item
+    firstBidding = bid.finalPrice(itemID)
     if firstBidding != None: #if there is a bid for the item
         return {"currentPrice": firstBidding["currentPrice"], "currency": "£"}
     else:

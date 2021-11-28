@@ -18,14 +18,33 @@
 <button type="button" onclick="submit()">submit</button><br>
 
 <script>
+    function insideString(character, string){ //this checks the email address has an @ inside it
+        array = string.split("")
+        for(i = 0; i < array.length; i++){
+            if(array[i] == "@"){
+                return true;
+            }
+        }
+        return false;
+    }
+
     function submit(){
         document.cookie=''; //removes any cookies that may be there
         if(document.getElementById("password").value == document.getElementById("password2").value){ //checks if the two passwords 
-            //window.location.replace("/login"); //sends to new page, user will probably want to login after creating their new account
-            document.form.submit(); //submits the form, learnt in https://www.javascript-coder.com/javascript-form/javascript-form-submit/
+            if(document.getElementById("phoneNumber").value.length < 11){
+                inside = insideString("@", document.getElementById("email").value) //sees if "@" is inside the email
+                if(document.getElementById("email").value.length < 50 && inside){
+                    document.form.submit(); //submits the form, learnt in https://www.javascript-coder.com/javascript-form/javascript-form-submit/
+                }else{
+                    error.innerHTML = "<p>Invalid email</p>"; //inject a message in the html when phone number isn;t valid
+                }
+                
+            }else{
+                error.innerHTML = "<p>Invalid phone number</p>"; //inject a message in the html when phone number isn;t valid
+            }
         }
         else{
-            error.innerHTML = "<p>Two passwords are not the same</p>" //inject a meessage in the html when the two passwords do not match
+            error.innerHTML = "<p>Two passwords are not the same</p>"; //inject a message in the html when the two passwords do not match
         }
 
     }

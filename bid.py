@@ -75,6 +75,7 @@ def finalPrice(itemID):
     else:
         return {"currentPrice": "0", "username": "", "itemID":""}
 
+
 if __name__ == "__main__":
     print(maxBid(1))
     #print(secondMaxBid(1))

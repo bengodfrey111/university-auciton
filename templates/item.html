@@ -20,12 +20,16 @@
 
 
 
-    function currentPrice(){ //retreives the json that gives the current price of the item
+    function currentPrice(){ //retrieves the json that gives the current price of the item
         attributes = {};
         fetch("/item/{{idImage}}/jsonPrice")    
         .then(res => res.json())
         .then((out) => {
-        price.innerHTML = out["currency"] + out["currentPrice"] + "0"; //displays the result in html
+        if(out["currentPrice"] % 1 == 0){
+            price.innerHTML = out["currency"] + out["currentPrice"]; //displays the result in html
+        }else{
+            price.innerHTML = out["currency"] + out["currentPrice"] + "0"; //displays the result in html
+        }
         });
     }
 
@@ -63,7 +67,7 @@
         timeDisplay.innerHTML+= " " + timeLeftList["minutes"] + " minutes";
         timeDisplay.innerHTML+= " " + timeLeftList["hours"] + " hours";
         timeDisplay.innerHTML+= " " + timeLeftList["days"] + " days";
-        timeDisplay.innerHTML+= " " + timeLeftList["weeks"] + " weeks left";
+        timeDisplay.innerHTML+= " " + timeLeftList["weeks"] + " weeks left"; //displaying how long is left of the acution
     }
 
 
@@ -77,7 +81,7 @@
             .then(res => res.json())// https://www.codegrepper.com/code-examples/javascript/javascript+read+json+file+from+url
             .then((out) => {
             description.innerHTML = out["description"];
-            nameHeading.innerHTML = out["name"];
+            nameHeading.innerHTML = out["name"]; //displaying some of the attributes in the html
             title.innerHTML = out["name"];
             if({{sold}}(true)){
                 time(out["datetime"]);
