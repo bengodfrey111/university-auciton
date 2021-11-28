@@ -94,11 +94,12 @@ def loginPage(validCredentials = ""):
     if request.method == "POST": #if tis handling the forms
         username = request.form["username"]
         password = request.form["password"] #gets inputed username and password
-        if login.login(username, password): #if login credentials are valid then goes to right page, else goes back to log in so that they can put in valid credentials
-            session["username"] = username
-            return "<script>window.location.replace('/')</script>"
-        else:
-            return render_template("login.html", validUser="!") #send login page up with error message if login is invalid
+        if len(username) < 50 and len(password) < 50:
+            if login.login(username, password): #if login credentials are valid then goes to right page, else goes back to log in so that they can put in valid credentials
+                session["username"] = username
+                return "<script>window.location.replace('/')</script>"
+            else:
+                return render_template("login.html", validUser="!") #send login page up with error message if login is invalid
     return render_template("login.html", validUser=validCredentials) #just displays the login page
 
 
@@ -184,8 +185,12 @@ def bidPage(ID): #this will allow the user to make a bid
                         currentAccount = login.account(session["username"])
                         emailSend.bidSet(itemAtr, maxBid, currentAccount)
                         secondMax = bid.secondMaxBid(ID)
+                        newMax = bid.maxBid(ID)
                         if max == secondMax: #this will send an email if someones bid was surpassed
                             surAccount = login.account(itemAtr["username"])
+                            emailSend.surpassedBid(itemAtr, surAccount)
+                        elif newMax["username"] != session["username"]:
+                            surAccount = login.account(session["username"])
                             emailSend.surpassedBid(itemAtr, surAccount)
                     return item(ID)
             else:

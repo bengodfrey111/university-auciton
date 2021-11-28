@@ -45,10 +45,10 @@ def wonBid(item, finalBid, user): #this sends an email when someone suppasses th
     server.sendmail(fromaddr, toaddr, text)
     server.quit()
 
-def bidSet(item, user, currentPrice): #this sends an email of when someone wins the bid
+def bidSet(item, currentPrice, user): #this sends an email of when someone wins the bid
     fromaddr = "devmail8022@gmail.com"
     toaddr = user["email"]
-    text = "you have won " + str(item["name"]) + " for " + str(currentPrice) + " pounds"
+    text = "you have bidded for a " + str(item["name"]) + " for a maxmimum bid of " + str(currentPrice) + " pounds"
     #subject = "you have set a bid"
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.ehlo()

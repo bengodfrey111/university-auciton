@@ -68,7 +68,7 @@ def finalPrice(itemID):
     max = maxBid(itemID)
     secondMax = secondMaxBid(itemID)
     if str(max["maxBid"]) != "None":
-        if str(secondMax["maxBid"]) != "None": #this checks if the highest and second highest bid exists
+        if str(secondMax["maxBid"]) != "0" and float(secondMax["maxBid"]) + 0.1 <= float(max["maxBid"]): #this checks if the highest and second highest bid exists
             return {"currentPrice": float(secondMax["maxBid"]) + 0.1, "username": max["username"], "itemID": max["itemID"]} #makes current price 10p higher than second highest bid
         else:
             return {"currentPrice": float(max["maxBid"]), "username": max["username"], "itemID": max["itemID"]}
